@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VideoPremium/Gratis</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        body { background: #0f172a; color: #fff; min-height: 100vh; padding-top: 70px; }
+        
+        nav {
+            position: fixed; top: 0; left: 0; width: 100%; background: #1e293b;
+            padding: 1rem 5%; display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 3px solid #3b82f6; z-index: 99;
+        }
+        .logo { font-size: 1.4rem; color: #3b82f6; font-weight: bold; }
+        .nav-link { color: #cbd5e1; margin-left: 1.2rem; text-decoration: none; }
+        .nav-link:hover, .nav-link.aktif { color: #3b82f6; }
+        .btn-masuk { background: #3b82f6; padding: 0.5rem 1.2rem; border-radius: 6px; }
+        .btn-masuk:hover { background: #2563eb; color: #fff; }
+        .user-info { display: flex; align-items: center; gap: 0.8rem; }
+        .lencana-premium {
+            background: #f59e0b; color: #1e293b; padding: 0.2rem 0.6rem;
+            border-radius: 20px; font-size: 0.75rem; font-weight: bold;
+        }
+
+        .container { max-width: 1200px; margin: 2rem auto; padding: 0 5%; }
+        .pilihan { display: flex; gap: 1rem; justify-content: center; margin-bottom: 2rem; flex-wrap: wrap; }
+        .btn-pilihan { 
+            padding: 0.8rem 2rem; border: none; border-radius: 8px; font-size: 1rem; cursor: pointer;
+            transition: all 0.3s; font-weight: 600;
+        }
+        .btn-gratis { background: #10b981; color: #fff; }
+        .btn-gratis.aktif, .btn-gratis:hover { background: #059669; transform: translateY(-2px); }
+        .btn-premium { background: #f59e0b; color: #1e293b; }
+        .btn-premium.aktif, .btn-premium:hover { background: #d97706; transform: translateY(-2px); }
+
+        .daftar-video { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem; }
+        .kartu-video {
+            background: #1e293b; border-radius: 12px; overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3); transition: transform 0.3s;
+        }
+        .kartu-video:hover { transform: translateY(-5px); }
+        .kartu-video video { width: 100%; height: 160px; object-fit: cover; background: #334155; }
+        .info { padding: 1rem; }
+        .info h3 { font-size: 1rem; margin-bottom: 0.5rem; }
+        .label { display: inline-block; padding: 0.2rem 0.6rem; border-radius: 20px; font-size: 0.75rem; font-weight: bold; margin-bottom: 0.7rem; }
+        .label-gratis { background: #10b981; }
+        .label-premium { background: #f59e0b; color: #1e293b; }
+        .tombol-unduh {
+            width: 100%; padding: 0.7rem; margin-top: 0.5rem; background: #3b82f6; color: #fff;
+            border: none; border-radius: 6px; cursor: pointer; font-weight: 600; transition: background 0.3s;
+        }
+        .tombol-unduh:hover { background: #2563eb; }
+        .terkunci { opacity: 0.7; }
+        .terkunci .tombol-unduh { background: #64748b; cursor: not-allowed; }
+        .pesan-kunci { color: #fbbf24; font-size: 0.85rem; margin-top: 0.5rem; }
+
+        footer { text-align: center; padding: 2rem; margin-top: 3rem; color: #94a3b8; border-top: 1px solid #334155; }
+        
+        .modal {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.7); justify-content: center; align-items: center; z-index: 100;
+        }
+        .modal-buka { display: flex; }
+        .modal-kotak {
+            background: #1e293b; padding: 2rem; border-radius: 12px; width: 90%; max-width: 420px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+        }
+        .modal-kotak h2 { margin-bottom: 1.5rem; color: #3b82f6; text-align: center; }
+        .modal-kotak input {
+            width: 100%; padding: 0.8rem; margin-bottom: 1rem;
+            background: #0f172a; border: 1px solid #475569; border-radius: 6px; color: #fff;
+        }
+        .modal-kotak button { width: 100%; padding: 0.8rem; border: none; border-radius: 6px; font-size: 1rem; font-weight: 600; cursor: pointer; }
+        .btn-primer { background: #3b82f6; color: #fff; margin-top: 0.5rem; }
+        .btn-primer:hover { background: #2563eb; }
+        .btn-tutup { background: #ef4444; color: #fff; margin-top: 0.5rem; }
+        .tautan { color: #94a3b8; margin-top: 1rem; text-align: center; font-size: 0.9rem; }
+        .tautan span { color: #3b82f6; cursor: pointer; }
+        .tautan span:hover { text-decoration: underline; }
+        .peringatan { color: #f87171; margin-top: 0.5rem; display: none; }
+    </style>
+</head>
+<body>
+
+<nav>
+    <div class="logo">🎵 VideoPremium/Gratis</div>
+    <div id="nav-menu">
+        <a href="#" class="nav-link btn-masuk" onclick="bukaModal('masuk')">Masuk / Daftar</a>
+    </div>
+</nav>
+
+<div class="container">
+    <div class="pilihan">
+        <button class="btn-pilihan btn-gratis aktif" onclick="tampilkan('gratis')">🎁 Video Gratis</button>
+        <button class="btn-pilihan btn-premium" onclick="tampilkan('premium')">⭐ Video Premium</button>
+    </div>
+    <div class="daftar-video" id="daftarVideo"></div>
+</div>
+
+<footer>
+    &copy; 2026 VideoPremium/Gratis — Semua Hak Dilindungi
+</footer>
+
+<div class="modal" id="modalAkun">
+    <div class="modal-kotak">
+        <h2 id="judulModal">Masuk ke Akun</h2>
+        <input type="text" id="inputNama" placeholder="Nama Pengguna">
+        <input type="password" id="inputSandi" placeholder="Kata Sandi">
+        <p class="peringatan" id="peringatan">Pesan kesalahan</p>
+        <button class="btn-primer" id="btnAksi" onclick="prosesAksi()">Masuk</button>
+        <button class="btn-tutup" onclick="tutupModal()">Tutup</button>
+        <div class="tautan" id="teksPindah">
+            Belum punya akun? <span onclick="gantiMode()">Daftar di sini</span>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="modalUpgrade">
+    <div class="modal-kotak">
+        <h2>⭐ Tingkatkan ke Premium</h2>
+        <p style="text-align:center; margin-bottom:1rem;">Akses unduh semua video Premium selamanya!</p>
+        <p style="text-align:center; font-size:1.5rem; font-weight:bold; color:#f59e0b; margin-bottom:1rem;">Gratis Percobaan!</p>
+        <button class="btn-primer" onclick="prosesUpgrade()">Langganan Sekarang</button>
+        <button class="btn-tutup" onclick="tutupModal()">Nanti Saja</button>
+    </div>
+</div>
+
+<script>
+const videoList = [
+    { id:1, judul:"Lagu Pantai — Irama Santai", tipe:"gratis", sumber:"https://www.w3schools.com/html/mov_bbb.mp4", deskripsi:"Musik santai menenangkan pikiran" },
+    { id:2, judul:"Gitar Akustik — Senandung Pagi", tipe:"gratis", sumber:"https://www.w3schools.com/html/movie.mp4", deskripsi:"Nada lembut cocok belajar" },
+    { id:3, judul:"Orkestra Megah — Keagungan Dunia", tipe:"premium", sumber:"https://www.w3schools.com/html/mov_bbb.mp4", deskripsi:"Kualitas suara jernih & eksklusif" },
+    { id:4, judul:"Musik Elektronik — Energi Hidup", tipe:"premium", sumber:"https://www.w3schools.com/html/movie.mp4", deskripsi:"Ritme modern penuh semangat" },
+    { id:5, judul:"Lagu Daerah — Warisan Budaya", tipe:"gratis", sumber:"https://www.w3schools.com/html/mov_bbb.mp4", deskripsi:"Koleksi lagu khas Nusantara" },
+    { id:6, judul:"Piano Emosi — Cerita Hati", tipe:"premium", sumber:"https://www.w3schools.com/html/movie.mp4", deskripsi:"Karya seniman ternama" }
+];
+
+let kategoriAktif = 'gratis';
+let modeAkun = 'masuk';
+let penggunaSekarang = JSON.parse(localStorage.getItem('penggunaAktif')) || null;
+
+window.onload = function() {
+    perbaruiNav();
+    renderKartu();
+};
+
+function tampilkan(tipe) {
+    kategoriAktif = tipe;
+    document.querySelectorAll('.btn-pilihan').forEach(b => b.classList.remove('aktif'));
+    event.target.classList.add('aktif');
+    renderKartu();
+}
+
+function renderKartu() {
+    const wadah = document.getElementById('daftarVideo');
+    const terfilter = videoList.filter(v => v.tipe === kategoriAktif);
+    
+    wadah.innerHTML = terfilter.map(v => {
+        const labelKelas = v.tipe === 'gratis' ? 'label-gratis' : 'label-premium';
+        const labelTeks = v.tipe === 'gratis' ? 'GRATIS' : 'PREMIUM';
+        
+        let bisaUnduh = false;
+        if (v.tipe === 'gratis') {
+            bisaUnduh = true;
+        } else {
+            bisaUnduh = penggunaSekarang && penggunaSekarang.premium;
+        }
+
+        const terkunci = !bisaUnduh ? 'terkunci' : '';
+        const pesan = !bisaUnduh 
+            ? (penggunaSekarang ? '<p class="pesan-kunci">🔒 Tingkatkan ke Premium untuk mengunduh</p>' : '<p class="pesan-kunci">🔒 Masuk & langganan untuk mengunduh</p>') 
+            : '';
+        const tombol = bisaUnduh 
+            ? `<a href="${v.sumber}" download class="tombol-unduh">⬇ Unduh Video</a>` 
+            : `<button class="tombol-unduh" onclick="${penggunaSekarang ? "bukaModal('upgrade')" : "bukaModal('masuk')"}">🔒 Terkunci</button>`;
+
+        return `
+        <div class="kartu-video ${terkunci}">
+            <video controls>
+                <source src="${v.sumber}" type="video/mp4">
+                Peramban Anda tidak mendukung pemutar video.
+            </video>
+            <div class="info">
+                <span class="label ${labelKelas}">${labelTeks}</span>
+                <h3>${v.judul}</h3>
+                <p style="color:#94a3b8; font-size:0.85rem; margin-bottom:0.5rem;">${v.deskripsi}</p>
+                ${pesan}
+                ${tombol}
+            </div>
+        </div>`;
+    }).join('');
+}
+
+function bukaModal(jenis) {
+    if (jenis === 'upgrade') {
+        document.getElementById('modalUpgrade').classList.add('modal-buka');
+    } else {
+        modeAkun = jenis;
+        document.getElementById('judulModal').textContent = jenis === 'masuk' ? 'Masuk ke Akun' : 'Buat Akun Baru';
+        document.getElementById('btnAksi').textContent = jenis === 'masuk' ? 'Masuk' : 'Daftar';
+        document.getElementById('teksPindah').innerHTML = jenis === 'masuk' 
+            ? `Belum punya akun? <span onclick="gantiMode()">Daftar di sini</span>`
+            : `Sudah punya akun? <span onclick="gantiMode()">Masuk di sini</span>`;
+        document.getElementById('peringatan').style.display = 'none';
+        document.getElementById('modalAkun').classList.add('modal-buka');
+    }
+}
+
+function tutupModal() {
+    document.querySelectorAll('.modal').forEach(m => m.classList.remove('modal-buka'));
+    document.getElementById('inputNama').value = '';
+    document.getElementById('inputSandi').value = '';
+}
+
+function gantiMode() {
+    bukaModal(modeAkun === 'masuk' ? 'daftar' : 'masuk');
+}
+
+function prosesAksi() {
+    const nama = document.getElementById('inputNama').value.trim();
+    const sandi = document.getElementById('inputSandi').value.trim();
+    const peringatan = document.getElementById('peringatan');
+
+    if (!nama || !sandi) {
+        peringatan.textContent = 'Nama dan sandi tidak boleh kosong!';
+        peringatan.style.display = 'block';
+        return;
+    }
+
+    let daftarPengguna = JSON.parse(localStorage.getItem('daftarPengguna')) || [];
+
+    if (modeAkun === 'daftar') {
+        if (daftarPengguna.find(p => p.nama === nama)) {
+            peringatan.textContent = 'Nama pengguna sudah dipakai!';
+            peringatan.style.display = 'block';
+            return;
+        }
+        const penggunaBaru = { nama, sandi, premium: false };
+        daftarPengguna.push(penggunaBaru);
+        localStorage.setItem('daftarPengguna', JSON.stringify(daftarPengguna));
+        penggunaSekarang = penggunaBaru;
+        localStorage.setItem('penggunaAktif', JSON.stringify(penggunaSekarang));
+        tutupModal();
+        perbaruiNav();
+        renderKartu();
+    } else {
+        const ketemu = daftarPengguna.find(p => p.nama === nama && p.sandi === sandi);
+        if (!ketemu) {
+            peringatan.textContent = 'Nama atau sandi salah!';
+            peringatan.style.display = 'block';
+            return;
+        }
+        penggunaSekarang = ketemu;
+        localStorage.setItem('penggunaAktif', JSON.stringify(penggunaSekarang));
+        tutupModal();
+        perbaruiNav();
+        renderKartu();
+    }
+}
+
+function prosesUpgrade() {
+    let daftarPengguna = JSON.parse(localStorage.getItem('daftarPengguna')) || [];
+    const indeks = daftarPengguna.findIndex(p => p.nama === penggunaSekarang.nama);
+    if (indeks !== -1) {
+        daftarPengguna[indeks].premium = true;
+        localStorage.setItem('daftarPengguna', JSON.stringify(daftarPengguna));
+        penggunaSekarang.premium = true;
+        localStorage.setItem('penggunaAktif', JSON.stringify(penggunaSekarang));
+    }
+    alert('🎉 Selamat! Akun Anda sudah Premium! Sekarang bisa unduh semua video.');
+    tutupModal();
+    perbaruiNav();
+    renderKartu();
+}
+
+function keluar() {
+    localStorage.removeItem('penggunaAktif');
+    penggunaSekarang = null;
+    perbaruiNav();
+    renderKartu();
+}
+
+function perbaruiNav() {
+    const menu = document.getElementById('nav-menu');
+    if (penggunaSekarang) {
+        menu.innerHTML = `
+            <div class="user-info">
+                <span>Halo, ${penggunaSekarang.nama}</span>
+                ${penggunaSekarang.premium ? '<span class="lencana-premium">⭐ PREMIUM</span>' : ''}
+                <a href="#" class="nav-link" onclick="${penggunaSekarang.premium ? 'keluar()' : "bukaModal('upgrade')"}">
+                    ${penggunaSekarang.premium ? 'Keluar' : 'Langganan Premium'}
+                </a>
+            </div>`;
+    } else {
+        menu.innerHTML = `<a href="#" class="nav-link btn-masuk" onclick="bukaModal('masuk')">Masuk / Daftar</a>`;
+    }
+}
+</script>
+
+</body>
+</html>
